@@ -7,3 +7,9 @@ Flask-SQLAlchemy
 pyngrok
 psycopg2-binary==2.9.3
 ngrok
+Sphinx==7.4.7
+sphinx-copybutton
+sphinxcontrib-googleanalytics
+sphinx-togglebutton
+sphinx-rtd-theme
+sphinxcontrib-jquery
