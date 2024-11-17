@@ -1,0 +1,9 @@
+Flask
+requests
+python-dotenv
+telebot
+python-telegram-bot
+Flask-SQLAlchemy
+pyngrok
+psycopg2-binary==2.9.3
+ngrok

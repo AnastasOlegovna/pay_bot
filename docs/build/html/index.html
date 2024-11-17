@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bot Overview and Functionality &mdash; Payment bot 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/togglebutton.css?v=13237357" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=2709fde1"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="_static/copybutton.js?v=f281be69"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="_static/togglebutton.js?v=4a39c7ea"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="How to Install Bot" href="readme.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="#" class="icon icon-home">
+            Payment bot
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="readme.html">How to Install Bot</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">Payment bot</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Bot Overview and Functionality</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="bot-overview-and-functionality">
+<h1>Bot Overview and Functionality<a class="headerlink" href="#bot-overview-and-functionality" title="Link to this heading"></a></h1>
+<dl class="simple">
+<dt>This bot leverages Flask and Telegram APIs to provide a range of functionalities including:</dt><dd><ul class="simple">
+<li><p>Handling user payments through Telegram and Stripe</p></li>
+<li><p>Recording user information in a PostgreSQL database</p></li>
+<li><p>Managing different interactive elements and responses for users</p></li>
+</ul>
+</dd>
+</dl>
+<div class="image-right docutils container">
+<a class="reference internal image-reference" href="_images/payment-method.png"><img alt="pay" src="_images/payment-method.png" style="width: 204.8px; height: 204.8px;" /></a>
+</div>
+<section id="components-and-workflow">
+<h2>Components and Workflow<a class="headerlink" href="#components-and-workflow" title="Link to this heading"></a></h2>
+<ol class="arabic">
+<li><p><strong>Importing Required Libraries</strong>
+The bot script begins by importing necessary libraries:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Flask</span><span class="p">,</span> <span class="n">request</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">time</span> <span class="k">as</span> <span class="nn">t</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">telebot.types</span> <span class="kn">import</span> <span class="n">LabeledPrice</span><span class="p">,</span> <span class="n">InlineKeyboardButton</span><span class="p">,</span> <span class="n">InlineKeyboardMarkup</span>
+<span class="kn">import</span> <span class="nn">telebot</span>
+<span class="kn">from</span> <span class="nn">telebot</span> <span class="kn">import</span> <span class="n">types</span>
+<span class="kn">from</span> <span class="nn">telegram.error</span> <span class="kn">import</span> <span class="n">BadRequest</span>
+<span class="kn">from</span> <span class="nn">flask_sqlalchemy</span> <span class="kn">import</span> <span class="n">SQLAlchemy</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">ngrok</span>
+</pre></div>
+</div>
+<p>Additionally, custom modules are imported for handling specific tasks, such as interacting with the database and loading configuration.</p>
+</li>
+<li><p><strong>Setting Up Database and Flask</strong>
+The bot uses Flask as a web server and connects to a PostgreSQL database via SQLAlchemy:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="n">SQLAlchemy</span><span class="p">()</span>
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;SQLALCHEMY_DATABASE_URI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_from_env</span><span class="p">(</span><span class="s1">&#39;DATABASE_URL&#39;</span><span class="p">)</span>
+<span class="n">db</span><span class="o">.</span><span class="n">init_app</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p><strong>Configuring ngrok for Local Testing</strong>
+To expose the local server, ngrok is configured, with an authtoken fetched from environment variables:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">authtoken</span> <span class="o">=</span> <span class="n">get_from_env</span><span class="p">(</span><span class="s1">&#39;ENV_NGROK_AUTHTOKEN&#39;</span><span class="p">)</span>
+<span class="n">listener</span> <span class="o">=</span> <span class="n">ngrok</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="s2">&quot;localhost:5000&quot;</span><span class="p">,</span> <span class="n">authtoken</span><span class="o">=</span><span class="n">authtoken</span><span class="p">)</span>
+<span class="n">bot</span><span class="o">.</span><span class="n">set_webhook</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">listener</span><span class="o">.</span><span class="n">url</span><span class="p">()</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">bot</span><span class="o">.</span><span class="n">token</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p><strong>Creating the Bot and Webhook</strong>
+Using <cite>telebot</cite>, a Telegram bot instance is created and connected to a webhook to receive updates:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">bot</span> <span class="o">=</span> <span class="n">telebot</span><span class="o">.</span><span class="n">TeleBot</span><span class="p">(</span><span class="n">get_from_env</span><span class="p">(</span><span class="s2">&quot;TELEGRAM_BOT_TOKEN&quot;</span><span class="p">))</span>
+<span class="n">bot</span><span class="o">.</span><span class="n">set_webhook</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">listener</span><span class="o">.</span><span class="n">url</span><span class="p">()</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">bot</span><span class="o">.</span><span class="n">token</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p><strong>Setting Up Inline Keyboards</strong>
+Several buttons are configured to be displayed as inline options:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">inline_keyboard</span> <span class="o">=</span> <span class="n">InlineKeyboardMarkup</span><span class="p">()</span>
+<span class="n">pay_button</span> <span class="o">=</span> <span class="n">InlineKeyboardButton</span><span class="p">(</span><span class="s2">&quot;Pay&quot;</span><span class="p">,</span> <span class="n">pay</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">callback_data</span><span class="o">=</span><span class="s2">&quot;pay&quot;</span><span class="p">)</span>
+<span class="n">terms_button</span> <span class="o">=</span> <span class="n">InlineKeyboardButton</span><span class="p">(</span><span class="s2">&quot;Terms&quot;</span><span class="p">,</span> <span class="n">callback_data</span><span class="o">=</span><span class="s2">&quot;terms&quot;</span><span class="p">)</span>
+<span class="n">help_button</span> <span class="o">=</span> <span class="n">InlineKeyboardButton</span><span class="p">(</span><span class="s2">&quot;Help&quot;</span><span class="p">,</span> <span class="n">callback_data</span><span class="o">=</span><span class="s2">&quot;help&quot;</span><span class="p">)</span>
+<span class="n">inst_button</span> <span class="o">=</span> <span class="n">InlineKeyboardButton</span><span class="p">(</span><span class="s2">&quot;Instructions&quot;</span><span class="p">,</span> <span class="n">callback_data</span><span class="o">=</span><span class="s2">&quot;instructions&quot;</span><span class="p">)</span>
+<span class="n">keyboard_2</span> <span class="o">=</span> <span class="n">InlineKeyboardMarkup</span><span class="p">([[</span><span class="n">pay_button</span><span class="p">],</span> <span class="p">[</span><span class="n">terms_button</span><span class="p">],</span> <span class="p">[</span><span class="n">help_button</span><span class="p">],</span> <span class="p">[</span><span class="n">inst_button</span><span class="p">]])</span>
+</pre></div>
+</div>
+</li>
+<li><p><strong>Defining Bot Commands and Handlers</strong>
+Different bot commands handle user interactions, including:</p>
+<ul class="simple">
+<li><p><strong>/start</strong>: Greets the user and requests contact information.</p></li>
+<li><p><strong>/contact</strong>: Handles contact-sharing events and saves user data.</p></li>
+<li><p><strong>/location</strong>: Manages location-sharing events.</p></li>
+<li><p><strong>callback_query_handler</strong>: Responds to inline button actions, such as initiating payments or displaying terms.</p></li>
+</ul>
+<p>Sample command handler for <cite>/start</cite>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@bot</span><span class="o">.</span><span class="n">message_handler</span><span class="p">(</span><span class="n">commands</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">command_start</span><span class="p">(</span><span class="n">message</span><span class="p">):</span>
+   <span class="n">keyboard</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">ReplyKeyboardMarkup</span><span class="p">(</span><span class="n">row_width</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">resize_keyboard</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+   <span class="n">button_phone</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">KeyboardButton</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;Share Number&quot;</span><span class="p">,</span> <span class="n">request_contact</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+   <span class="n">keyboard</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">button_phone</span><span class="p">)</span>
+   <span class="n">bot</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="n">message</span><span class="o">.</span><span class="n">chat</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;Hello!&quot;</span><span class="p">,</span> <span class="n">reply_markup</span><span class="o">=</span><span class="n">keyboard</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p><strong>Payment Processing and Invoice Generation</strong>
+To handle payments, the bot uses <cite>LabeledPrice</cite> for the amount and generates invoices using the Telegram API:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">send_invoice</span><span class="p">(</span><span class="n">chat_id</span><span class="p">,</span> <span class="n">amount</span><span class="p">):</span>
+   <span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;Product Title&quot;</span>
+   <span class="n">description</span> <span class="o">=</span> <span class="s2">&quot;Product Description&quot;</span>
+   <span class="n">payload</span> <span class="o">=</span> <span class="s2">&quot;invoice_payload&quot;</span>
+   <span class="n">provider_token</span> <span class="o">=</span> <span class="n">get_from_env</span><span class="p">(</span><span class="s2">&quot;PAYMENT_TOKEN&quot;</span><span class="p">)</span>
+   <span class="n">currency</span> <span class="o">=</span> <span class="s1">&#39;USD&#39;</span>
+   <span class="n">prices</span> <span class="o">=</span> <span class="p">[</span><span class="n">LabeledPrice</span><span class="p">(</span><span class="s2">&quot;Product&quot;</span><span class="p">,</span> <span class="n">amount</span><span class="p">)]</span>
+   <span class="n">bot</span><span class="o">.</span><span class="n">send_invoice</span><span class="p">(</span><span class="n">chat_id</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">payload</span><span class="p">,</span> <span class="n">provider_token</span><span class="p">,</span> <span class="n">currency</span><span class="p">,</span> <span class="n">prices</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p><strong>Managing Pending Payments</strong>
+A dictionary <cite>pending_payments</cite> tracks payments in process. A separate thread periodically checks for timeouts:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">check_pending_payments</span><span class="p">():</span>
+   <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+      <span class="k">for</span> <span class="n">chat_id</span><span class="p">,</span> <span class="n">timestamp</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">pending_payments</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+         <span class="k">if</span> <span class="p">(</span><span class="n">timestamp</span> <span class="o">+</span> <span class="n">PAYMENT_TIMEOUT</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">t</span><span class="o">.</span><span class="n">time</span><span class="p">():</span>
+            <span class="k">del</span> <span class="n">pending_payments</span><span class="p">[</span><span class="n">chat_id</span><span class="p">]</span>
+            <span class="n">bot</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="n">chat_id</span><span class="p">,</span> <span class="s2">&quot;Payment timed out. Please try again.&quot;</span><span class="p">)</span>
+      <span class="n">t</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">60</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p><strong>Running the Application</strong>
+The Flask app and the <cite>check_pending_payments</cite> thread start together:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+   <span class="k">if</span> <span class="n">listener</span><span class="p">:</span>
+      <span class="n">thread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">check_pending_payments</span><span class="p">)</span>
+      <span class="n">thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+      <span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="s1">&#39;localhost&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">5000</span><span class="p">)</span>
+   <span class="k">else</span><span class="p">:</span>
+      <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ngrok URL not found. Webhook not set.&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="readme.html">How to Install Bot</a></li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="readme.html" class="btn btn-neutral float-right" title="How to Install Bot" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Anastasia Ponomarova.
+      <span class="lastupdated">Last updated on 17 Nov 2024.
+      </span></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
